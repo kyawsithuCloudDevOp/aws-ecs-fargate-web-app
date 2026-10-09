@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ECR repository for my app
+
+Resources:
+  AppRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: my-app
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      ImageTagMutability: IMMUTABLE
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [{
+              "rulePriority": 1,
+              "description": "Keep only the last 20 images",
+              "selection": {
+                "tagStatus": "any",
+                "countType": "imageCountMoreThan",
+                "countNumber": 20
+              },
+              "action": { "type": "expire" }
+            }]
+          }
+
+Outputs:
+  RepositoryUri:
+    Value: !GetAtt AppRepository.RepositoryUri
